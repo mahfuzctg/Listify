@@ -1,5 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface Item {
   name: string;
@@ -13,11 +21,13 @@ interface List {
   items: Item[];
   image?: string;
   link?: string;
+  _id: string;
 }
 
-const Homes = () => {
+const Modify = () => {
   const [lists, setLists] = useState<List[]>([]);
 
+  // Fetching data from the backend
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,21 +42,63 @@ const Homes = () => {
     fetchData();
   }, []);
 
+  // Handle Delete Action
+  const handleDelete = (id: string) => {
+    Alert.alert("Delete List", "Are you sure you want to delete this list?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: async () => {
+          try {
+            const response = await fetch(
+              `http://localhost:5000/api/lists/${id}`,
+              {
+                method: "DELETE",
+              }
+            );
+            const data = await response.json();
+
+            if (response.ok) {
+              setLists((prevLists) =>
+                prevLists.filter((list) => list._id !== id)
+              );
+              Alert.alert(
+                "Success",
+                data.message || "List deleted successfully"
+              );
+            } else {
+              Alert.alert("Error", data.message || "Error deleting list");
+            }
+          } catch (error) {
+            console.error("Error deleting list:", error);
+            Alert.alert("Error", "Error deleting list");
+          }
+        },
+      },
+    ]);
+  };
+
+  // Handle Update Action
+  const handleUpdate = (id: string) => {
+    console.log(`Update action for list with ID: ${id}`);
+    // Implement update logic here
+  };
+
   const renderItem = ({ item }: { item: List }) => (
-    <View className="bg-white  rounded-lg mx-4 my-4 p-5 w-[90%] border border-gray-200">
+    <View className="bg-white rounded-lg mx-4 my-4 p-5 w-[90%] border border-gray-200">
       {item.image && (
         <Image
           source={{ uri: item.image }}
           className="h-48 w-full rounded-lg mb-4 object-cover"
         />
       )}
-
       <Text className="text-2xl font-bold text-gray-900 tracking-wide mb-1">
         {item.title}
       </Text>
-
       <Text className="text-gray-600 text-sm leading-5 mb-2">{item.desc}</Text>
-
       <Text className="text-xs font-medium text-gray-500 italic mb-3">
         📅 {item.date}
       </Text>
@@ -70,12 +122,22 @@ const Homes = () => {
         keyExtractor={(i, idx) => `${idx}`}
       />
 
+      <View className="flex-row justify-end mt-4">
+        <TouchableOpacity
+          onPress={() => handleUpdate(item._id)}
+          className="mr-4"
+        >
+          <Ionicons name="create-outline" size={24} color="orange" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleDelete(item._id)}>
+          <Ionicons name="trash-bin-outline" size={24} color="red" />
+        </TouchableOpacity>
+      </View>
+
       {item.link && (
         <TouchableOpacity
           className="mt-5 py-2 bg-gradient-to-r from-orange-500 to-orange-700 rounded-full shadow-md"
-          onPress={() => {
-            console.log("Navigating to:", item.link);
-          }}
+          onPress={() => console.log("Navigating to:", item.link)}
         >
           <Text className="text-white text-center font-semibold text-lg">
             🔗 View Full List
@@ -87,10 +149,9 @@ const Homes = () => {
 
   return (
     <View className="bg-gray-100 flex-1 items-center justify-center py-6">
-      <Text className="text-xl  font-extrabold uppercase mb-6 tracking-wide">
-        📝 Welcome to <span className="text-orange-600">Listify</span>
+      <Text className="text-2xl text-orange-600 font-extrabold uppercase mb-6 tracking-wide">
+        📝 Update & Delete!
       </Text>
-
       <FlatList
         data={lists}
         renderItem={renderItem}
@@ -100,4 +161,4 @@ const Homes = () => {
   );
 };
 
-export default Homes;
+export default Modify;
