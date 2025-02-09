@@ -1,74 +1,100 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+interface Item {
+  name: string;
+  completed: boolean;
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+interface List {
+  title: string;
+  desc: string;
+  date: string;
+  items: Item[];
+  image?: string;
+  link?: string;
+}
+
+const Homes = () => {
+  const [lists, setLists] = useState<List[]>([]);
+
+  // Fetching data from the backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/lists");
+        const data = await response.json();
+        setLists(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const renderItem = ({ item }: { item: List }) => (
+    <View className="bg-white shadow-md rounded-lg m-4 p-4 w-[90%]">
+      {item.image && (
+        <Image
+          source={{ uri: item.image }}
+          className="h-40 w-full rounded-md mb-4"
+        />
+      )}
+      <Text className="text-xl font-semibold text-gray-800">{item.title}</Text>
+      <Text className="text-gray-600 mb-2">{item.desc}</Text>
+      <Text className="text-sm text-gray-500">{item.date}</Text>
+
+      {/* Render Items */}
+      <FlatList
+        data={item.items}
+        renderItem={({ item }) => (
+          <View className="flex-row justify-between items-center my-2">
+            <Text
+              className={item.completed ? "text-green-600" : "text-red-600"}
+            >
+              {item.name}
+            </Text>
+            <Text
+              className={item.completed ? "text-green-600" : "text-red-600"}
+            >
+              {item.completed ? "Completed" : "Pending"}
+            </Text>
+          </View>
+        )}
+        keyExtractor={(i, idx) => `${idx}`}
+      />
+
+      {item.link && (
+        <TouchableOpacity
+          className="mt-4 p-2 bg-orange-600 rounded-full"
+          onPress={() => {
+            // Handle link navigation
+            console.log("Navigating to:", item.link);
+          }}
+        >
+          <Text className="text-white text-center font-semibold">
+            View Full List
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
+  return (
+    <View className="bg-gray-100 flex-1 items-center justify-center">
+      <Text className="text-3xl text-orange-600 font-bold uppercase mb-6">
+        🧑‍💼 Welcome to Listify
+      </Text>
+
+      <FlatList
+        data={lists}
+        renderItem={renderItem}
+        keyExtractor={(item, idx) => `${idx}`}
+        // contentContainerStyle="px-4 py-2"
+      />
+    </View>
+  );
+};
+
+export default Homes;
