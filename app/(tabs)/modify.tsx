@@ -1,3 +1,4 @@
+import UpdateModal from "@/src/components/Update.Modal";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
@@ -26,6 +27,8 @@ interface List {
 
 const Modify = () => {
   const [lists, setLists] = useState<List[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedList, setSelectedList] = useState<List | null>(null);
 
   // Fetching data from the backend
   useEffect(() => {
@@ -59,9 +62,9 @@ const Modify = () => {
                 method: "DELETE",
               }
             );
-            const data = await response.json();
 
             if (response.ok) {
+              const data = await response.json();
               setLists((prevLists) =>
                 prevLists.filter((list) => list._id !== id)
               );
@@ -70,7 +73,8 @@ const Modify = () => {
                 data.message || "List deleted successfully"
               );
             } else {
-              Alert.alert("Error", data.message || "Error deleting list");
+              const errorData = await response.json();
+              Alert.alert("Error", errorData.message || "Error deleting list");
             }
           } catch (error) {
             console.error("Error deleting list:", error);
@@ -82,9 +86,18 @@ const Modify = () => {
   };
 
   // Handle Update Action
-  const handleUpdate = (id: string) => {
-    console.log(`Update action for list with ID: ${id}`);
-    // Implement update logic here
+  const handleUpdate = (list: List) => {
+    setSelectedList(list); // Set the selected list for update
+    setModalVisible(true); // Open the modal
+  };
+
+  // Handle updated list data from the modal
+  const handleUpdatedList = (updatedList: List) => {
+    setLists((prevLists) =>
+      prevLists.map((list) =>
+        list._id === updatedList._id ? updatedList : list
+      )
+    );
   };
 
   const renderItem = ({ item }: { item: List }) => (
@@ -122,15 +135,17 @@ const Modify = () => {
         keyExtractor={(i, idx) => `${idx}`}
       />
 
-      <View className="flex-row justify-end mt-4">
-        <TouchableOpacity
-          onPress={() => handleUpdate(item._id)}
-          className="mr-4"
-        >
-          <Ionicons name="create-outline" size={24} color="orange" />
+      <View className="flex-row justify-evenly mt-4">
+        <TouchableOpacity onPress={() => handleUpdate(item)}>
+          <Ionicons
+            name="create-outline"
+            size={28}
+            color="orange"
+            className="font-bold"
+          />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleDelete(item._id)}>
-          <Ionicons name="trash-bin-outline" size={24} color="red" />
+          <Ionicons name="trash-bin-outline" size={28} color="red" />
         </TouchableOpacity>
       </View>
 
@@ -157,6 +172,16 @@ const Modify = () => {
         renderItem={renderItem}
         keyExtractor={(item, idx) => `${idx}`}
       />
+
+      {/* UpdateModal */}
+      {selectedList && (
+        <UpdateModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          selectedList={selectedList}
+          onUpdate={handleUpdatedList}
+        />
+      )}
     </View>
   );
 };
