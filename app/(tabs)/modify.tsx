@@ -164,8 +164,8 @@ const Modify = () => {
 
   return (
     <View className="bg-gray-100 flex-1 items-center justify-center py-6">
-      <Text className="text-2xl text-orange-600 font-extrabold uppercase mb-6 tracking-wide">
-        📝 Update & Delete!
+      <Text className="text-xl  font-extrabold uppercase mb-6 tracking-wide">
+        📝 Update Your <span className="text-orange-600">List!</span>
       </Text>
       <FlatList
         data={lists}
