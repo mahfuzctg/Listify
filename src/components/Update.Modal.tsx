@@ -56,7 +56,7 @@ const UpdateModal: React.FC<ModalComponentProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/lists/${selectedList._id}`,
+        `https://listify-backend.vercel.app/api/lists/${selectedList._id}`,
         {
           method: "PUT",
           headers: {
@@ -92,7 +92,7 @@ const UpdateModal: React.FC<ModalComponentProps> = ({
       <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
         <View className="bg-white w-11/12 p-5 rounded-lg">
           <Text className="text-2xl font-bold uppercase text-gray-700 mb-3 text-center">
-            <span className="text-orange-500">Update</span> List
+            <Text className="text-orange-500">Update</Text> List
           </Text>
 
           <TextInput

@@ -34,7 +34,9 @@ const Modify = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/lists");
+        const response = await fetch(
+          "https://listify-backend.vercel.app/api/lists"
+        );
         const data = await response.json();
         setLists(data);
       } catch (error) {
@@ -57,7 +59,7 @@ const Modify = () => {
         onPress: async () => {
           try {
             const response = await fetch(
-              `http://localhost:5000/api/lists/${id}`,
+              `https://listify-backend.vercel.app/api/lists/${id}`,
               {
                 method: "DELETE",
               }
@@ -165,7 +167,7 @@ const Modify = () => {
   return (
     <View className="bg-gray-100 flex-1 items-center justify-center py-6">
       <Text className="text-xl  font-extrabold uppercase mb-6 tracking-wide">
-        📝 Update Your <span className="text-orange-600">List!</span>
+        📝 Update Your <Text className="text-orange-600">List!</Text>
       </Text>
       <FlatList
         data={lists}

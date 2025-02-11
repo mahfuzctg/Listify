@@ -21,7 +21,9 @@ const Homes = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/lists");
+        const response = await fetch(
+          "https://listify-backend.vercel.app/api/lists"
+        );
         const data = await response.json();
         setLists(data);
       } catch (error) {
@@ -88,7 +90,7 @@ const Homes = () => {
   return (
     <View className="bg-gray-100 flex-1 items-center justify-center py-6">
       <Text className="text-xl  font-extrabold uppercase mb-6 tracking-wide">
-        📝 Welcome to <span className="text-orange-600">Listify</span>
+        📝 Welcome to <Text className="text-orange-600">Listify</Text>
       </Text>
 
       <FlatList

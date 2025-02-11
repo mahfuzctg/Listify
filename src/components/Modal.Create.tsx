@@ -23,10 +23,10 @@ const CreateModal: React.FC<ModalComponentProps> = ({
   const [desc, setDesc] = useState("");
   const [date, setDate] = useState("");
   const [items, setItems] = useState([
-    { name: "Masum", completed: false },
-    { name: "Mahfuz", completed: false },
-    { name: "Sudipto das", completed: true },
-    { name: "Sajjad", completed: false },
+    { name: "", completed: false },
+    { name: "", completed: false },
+    { name: "", completed: true },
+    { name: "", completed: false },
   ]);
   const [image, setImage] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState("");
@@ -58,20 +58,23 @@ const CreateModal: React.FC<ModalComponentProps> = ({
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/lists", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          desc,
-          date,
-          items,
-          image: image || imageUrl,
-          link,
-        }),
-      });
+      const response = await fetch(
+        "https://listify-backend.vercel.app/api/lists",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title,
+            desc,
+            date,
+            items,
+            image: image || imageUrl,
+            link,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {
@@ -91,7 +94,7 @@ const CreateModal: React.FC<ModalComponentProps> = ({
       <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
         <View className="bg-white w-11/12 p-5 rounded-lg">
           <Text className="text-2xl font-bold uppercase text-gray-700 mb-3 text-center">
-            <span className="text-orange-500">Create</span> New List
+            <Text className="text-orange-500">Create</Text> New List
           </Text>
 
           <TextInput
@@ -117,12 +120,12 @@ const CreateModal: React.FC<ModalComponentProps> = ({
           />
 
           <View className="mb-3">
-            <Text className="font-semibold">Items (Students):</Text>
+            <Text className="font-semibold">List:</Text>
             {items.map((item, index) => (
               <View key={index} className="flex flex-row justify-between mb-2">
                 <TextInput
                   className="border border-gray-300 rounded p-2 mb-1 w-5/12"
-                  placeholder="Enter student name"
+                  placeholder="Enter name or list no"
                   value={item.name}
                   onChangeText={(text) => {
                     const updatedItems = [...items];
